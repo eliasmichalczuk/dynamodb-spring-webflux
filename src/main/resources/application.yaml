@@ -1,0 +1,12 @@
+aws:
+  dynamodb:
+    endpoint: http://localhost:8854
+    accessKey: blank
+    secretKey: blank
+
+server:
+  port: 9016
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
