@@ -1,9 +1,13 @@
 aws:
+  accessKeyId: blank
+  secretKey: blank
   dynamodb:
     endpoint: http://localhost:8854
-    accessKey: blank
-    secretKey: blank
-
+cloud:
+  aws:
+    region:
+      static: us-east-1
+      auto: false
 server:
   port: 9016
 

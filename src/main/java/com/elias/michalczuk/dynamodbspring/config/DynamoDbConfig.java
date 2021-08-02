@@ -13,9 +13,9 @@ import java.net.URI;
 
 @Configuration
 public class DynamoDbConfig {
-    @Value("${aws.dynamodb.accessKey}")
+    @Value("${aws.accessKeyId}")
     String accessKey;
-    @Value("${aws.dynamodb.secretKey}")
+    @Value("${aws.secretKey}")
     String secretKey;
     @Value("${aws.dynamodb.endpoint}")
     String dynamoDbEndPointUrl;
