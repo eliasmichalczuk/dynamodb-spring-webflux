@@ -3,34 +3,32 @@ package com.elias.michalczuk.dynamodbspring.product.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@DynamoDbBean
+@Document
+@Setter
 public class Product {
 
+    @Id
     private UUID id;
     private String name;
     private Long price;
 
-    @DynamoDbPartitionKey()
-    @DynamoDbAttribute("id")
     public UUID getId() {
         return id;
     }
 
-    @DynamoDbAttribute("name")
     public String getName() {
         return name;
     }
 
-    @DynamoDbAttribute("price")
     public Long getPrice() {
         return price;
     }

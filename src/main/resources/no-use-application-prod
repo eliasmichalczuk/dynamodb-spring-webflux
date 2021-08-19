@@ -11,6 +11,10 @@ cloud:
 server:
   port: 9016
 
+
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/mongodb
   main:
     allow-bean-definition-overriding: true

@@ -1,0 +1,49 @@
+aws:
+  accessKeyId: blank
+  secretKey: blank
+  dynamodb:
+    endpoint: http://localhost:8854
+cloud:
+  aws:
+    region:
+      static: us-east-1
+      auto: false
+server:
+  port: 9016
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/mongodb
+  main:
+    allow-bean-definition-overriding: true
+
+io:
+  netty:
+    handler: DEBUG
+    handler.proxy.HttpProxyHandler: DEBUG
+    handler.proxy.ProxyHandler: DEBUG
+  reactivex:
+    netty:
+      protocol:
+        http:
+          client: DEBUG
+org:
+  springframework:
+    web:
+      reactive:
+        function:
+          client: DEBUG
+reactor:
+  ipc:
+    netty:
+      channel: DEBUG
+      channel.ChannelOperationsHandler: DEBUG
+      http:
+        client: DEBUG
+        server:
+          HttpServer: DEBUG
+
+logging:
+  logstash:
+    enabled: true
