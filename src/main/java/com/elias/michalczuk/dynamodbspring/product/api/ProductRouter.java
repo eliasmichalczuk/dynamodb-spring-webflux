@@ -10,13 +10,13 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
-@Configuration
-public class ProductRouter {
-    @Bean
-    public RouterFunction<ServerResponse> route(ProductHandler handler) {
-
-        return RouterFunctions
-                .route(POST("/product/save").and(accept(MediaType.APPLICATION_JSON)), handler::save)
-                .andRoute(GET("/product/getAll").and(accept(MediaType.APPLICATION_JSON)), handler::getAll);
-    }
-}
+//@Configuration
+//public class ProductRouter {
+//    @Bean
+//    public RouterFunction<ServerResponse> route(ProductHandler handler) {
+//
+//        return RouterFunctions
+//                .route(POST("/product/save").and(accept(MediaType.APPLICATION_JSON)), handler::save)
+//                .andRoute(GET("/product/getAll").and(accept(MediaType.APPLICATION_JSON)), handler::getAll);
+//    }
+//}
