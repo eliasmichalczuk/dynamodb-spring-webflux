@@ -19,8 +19,7 @@ public class Purchase {
 
     @Id
     private UUID id;
-    @DBRef
-    private List<Product> products = new LinkedList<>();
+    private List<UUID> products = new LinkedList<>();
 
 
     public Purchase generateId() {

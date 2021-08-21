@@ -5,6 +5,7 @@ import com.elias.michalczuk.dynamodbspring.product.domain.Product;
 import com.elias.michalczuk.dynamodbspring.product.exception.ProductNotFoundException;
 import com.elias.michalczuk.dynamodbspring.product.repository.ProductRepository;
 import com.elias.michalczuk.dynamodbspring.purchase.api.dto.CreatePurchaseDto;
+import com.elias.michalczuk.dynamodbspring.purchase.api.dto.PurchaseGetAllDto;
 import com.elias.michalczuk.dynamodbspring.purchase.domain.Purchase;
 import com.elias.michalczuk.dynamodbspring.purchase.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
@@ -31,13 +32,9 @@ public class PurchaseApplicationService {
     public Mono<Purchase> create(CreatePurchaseDto purchase) {
         return Flux.fromIterable(purchase.getProductIds())
                 .flatMap(uuid -> productRepository.findById(uuid)
-                        .switchIfEmpty(Mono.just(new Product()))
-                        .map(product -> {
-                            if (product.getId() == null) {
-                                throw new ProductNotFoundException();
-                            }
-                            return product;
-                        })
+                        .switchIfEmpty(Mono.defer(() -> {
+                            throw new ProductNotFoundException();
+                        }))
                         .onErrorStop()
                 )
                 .parallel()
@@ -47,10 +44,22 @@ public class PurchaseApplicationService {
                 .flatMap(products ->
                     purchaseRepository.save(
                             Purchase.builder()
-                                    .products(products)
+                                    .products(products.stream().map(Product::getId).collect(Collectors.toList()))
                                     .id(UUID.randomUUID()).build()
                     )
                 )
                 .doOnError(err -> err.printStackTrace());
+    }
+
+    public Flux<PurchaseGetAllDto> getAll() {
+        return purchaseRepository.findAll()
+                .flatMap(purchase ->
+                    productRepository.findAllById(purchase.getProducts())
+                            .parallel()
+                            .runOn(Schedulers.boundedElastic())
+                            .sequential()
+                            .collectList()
+                            .map(products -> PurchaseGetAllDto.of(products))
+                );
     }
 }

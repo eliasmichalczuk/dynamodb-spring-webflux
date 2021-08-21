@@ -1,6 +1,7 @@
 package com.elias.michalczuk.dynamodbspring.config;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,6 +32,7 @@ public class ErrorHandler implements ErrorWebExceptionHandler {
         this.objectMapper = objectMapper;
     }
 
+    @SneakyThrows
     @Override
     public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
 
@@ -47,9 +49,10 @@ public class ErrorHandler implements ErrorWebExceptionHandler {
             return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));
         }
 
+        throwable.printStackTrace();
         serverWebExchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         serverWebExchange.getResponse().getHeaders().setContentType(MediaType.TEXT_PLAIN);
-        DataBuffer dataBuffer = bufferFactory.wrap("Unknown error".getBytes());
+        DataBuffer dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(throwable));
         return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));
     }
 

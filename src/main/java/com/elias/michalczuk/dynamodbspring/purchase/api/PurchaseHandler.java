@@ -1,12 +1,9 @@
 package com.elias.michalczuk.dynamodbspring.purchase.api;
 
 import com.elias.michalczuk.dynamodbspring.DynamodbSpringApplication;
-import com.elias.michalczuk.dynamodbspring.product.domain.Product;
-import com.elias.michalczuk.dynamodbspring.product.repository.ProductRepository;
 import com.elias.michalczuk.dynamodbspring.purchase.api.dto.CreatePurchaseDto;
 import com.elias.michalczuk.dynamodbspring.purchase.application.PurchaseApplicationService;
 import com.elias.michalczuk.dynamodbspring.purchase.domain.Purchase;
-import com.mongodb.internal.connection.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +27,10 @@ public class PurchaseHandler {
                 .flatMap(purchase -> ServerResponse.ok().build());
     }
 
-//    public Mono<ServerResponse> getAll(ServerRequest request) {
-//        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-//                .body(productRepository.findAll(), Product.class).doOnError(err -> {
-//                    err.printStackTrace();
-//                });
-//    }
+    public Mono<ServerResponse> getAll(ServerRequest request) {
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(purchaseApplicationService.getAll(), Purchase.class).doOnError(err -> {
+                    err.printStackTrace();
+                });
+    }
 }

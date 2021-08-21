@@ -20,6 +20,6 @@ public class Router {
                 .route(POST("/product/save").and(accept(MediaType.APPLICATION_JSON)), handler::save)
                 .andRoute(GET("/product/getAll").and(accept(MediaType.APPLICATION_JSON)), handler::getAll)
                 .andRoute(POST("/purchase/create").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::create)
-                .andRoute(GET("/purchase/getAll").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::create);
+                .andRoute(GET("/purchase/getAll").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::getAll);
     }
 }
