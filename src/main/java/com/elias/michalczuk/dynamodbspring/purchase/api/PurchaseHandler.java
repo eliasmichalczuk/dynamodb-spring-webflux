@@ -27,8 +27,7 @@ public class PurchaseHandler {
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(CreatePurchaseDto.class)
                 .flatMap(purchase -> purchaseApplicationService.create(purchase))
-                .flatMap(purchase -> ServerResponse.ok().build())
-                .onErrorResume(err -> ServerResponse.badRequest().bodyValue(err));
+                .flatMap(purchase -> ServerResponse.ok().build());
     }
 
 //    public Mono<ServerResponse> getAll(ServerRequest request) {

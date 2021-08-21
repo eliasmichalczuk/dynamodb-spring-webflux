@@ -1,4 +1,11 @@
 package com.elias.michalczuk.dynamodbspring.product.exception;
 
-public class ProductNotFoundException extends RuntimeException {
+import com.elias.michalczuk.dynamodbspring.config.DomainException;
+import org.springframework.http.HttpStatus;
+
+
+public class ProductNotFoundException extends DomainException {
+    public ProductNotFoundException() {
+        super("Product not found", HttpStatus.BAD_REQUEST);
+    }
 }

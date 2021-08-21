@@ -31,22 +31,15 @@ public class PurchaseApplicationService {
     public Mono<Purchase> create(CreatePurchaseDto purchase) {
         return Flux.fromIterable(purchase.getProductIds())
                 .flatMap(uuid -> productRepository.findById(uuid)
-//                        .handle((product, sink) -> {
-//                            if (product == null) {
-//                                sink.error(new ProductNotFoundException());
-//                            } else {
-//                                sink.next(product);
-//                            }
-//                        })
                         .switchIfEmpty(Mono.just(new Product()))
                         .map(product -> {
                             if (product.getId() == null) {
-                                return Mono.error(new ProductNotFoundException());
+                                throw new ProductNotFoundException();
                             }
                             return product;
                         })
+                        .onErrorStop()
                 )
-                .map(obj -> (Product) obj)
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
                 .sequential()
