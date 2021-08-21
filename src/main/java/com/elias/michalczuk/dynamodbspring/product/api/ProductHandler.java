@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 public class ProductHandler {
 
@@ -38,6 +40,14 @@ public class ProductHandler {
     public Mono<ServerResponse> getAll(ServerRequest request) {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(productRepository.findAll(), Product.class).doOnError(err -> {
+                    err.printStackTrace();
+                });
+    }
+
+    public Mono<ServerResponse> getById(ServerRequest request) {
+        UUID id = UUID.fromString(request.pathVariable("id"));
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(productRepository.findById(id), Product.class).doOnError(err -> {
                     err.printStackTrace();
                 });
     }

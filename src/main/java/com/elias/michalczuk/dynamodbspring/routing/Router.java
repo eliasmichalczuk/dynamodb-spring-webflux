@@ -19,6 +19,7 @@ public class Router {
         return RouterFunctions
                 .route(POST("/product/save").and(accept(MediaType.APPLICATION_JSON)), handler::save)
                 .andRoute(GET("/product/getAll").and(accept(MediaType.APPLICATION_JSON)), handler::getAll)
+                .andRoute(GET("/product/{id}").and(accept(MediaType.APPLICATION_JSON)), handler::getById)
                 .andRoute(POST("/purchase/create").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::create)
                 .andRoute(GET("/purchase/getAll").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::getAll);
     }
