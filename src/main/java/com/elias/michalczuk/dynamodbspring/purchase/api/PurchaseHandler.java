@@ -6,6 +6,7 @@ import com.elias.michalczuk.dynamodbspring.product.repository.ProductRepository;
 import com.elias.michalczuk.dynamodbspring.purchase.api.dto.CreatePurchaseDto;
 import com.elias.michalczuk.dynamodbspring.purchase.application.PurchaseApplicationService;
 import com.elias.michalczuk.dynamodbspring.purchase.domain.Purchase;
+import com.mongodb.internal.connection.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,7 @@ public class PurchaseHandler {
         return request.bodyToMono(CreatePurchaseDto.class)
                 .flatMap(purchase -> purchaseApplicationService.create(purchase))
                 .flatMap(purchase -> ServerResponse.ok().build())
-                .doOnError(err -> {
-                    err.printStackTrace();
-                });
+                .onErrorResume(err -> ServerResponse.badRequest().bodyValue(err));
     }
 
 //    public Mono<ServerResponse> getAll(ServerRequest request) {

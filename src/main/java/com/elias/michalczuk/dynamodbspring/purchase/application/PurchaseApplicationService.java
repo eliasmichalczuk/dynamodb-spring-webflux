@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,22 +30,34 @@ public class PurchaseApplicationService {
 
     public Mono<Purchase> create(CreatePurchaseDto purchase) {
         return Flux.fromIterable(purchase.getProductIds())
-                .flatMap(productRepository::findById)
-                .doOnError(err -> {
-                    err.printStackTrace();
-                    throw new ProductNotFoundException();
-                })
+                .flatMap(uuid -> productRepository.findById(uuid)
+//                        .handle((product, sink) -> {
+//                            if (product == null) {
+//                                sink.error(new ProductNotFoundException());
+//                            } else {
+//                                sink.next(product);
+//                            }
+//                        })
+                        .switchIfEmpty(Mono.just(new Product()))
+                        .map(product -> {
+                            if (product.getId() == null) {
+                                return Mono.error(new ProductNotFoundException());
+                            }
+                            return product;
+                        })
+                )
+                .map(obj -> (Product) obj)
                 .parallel()
+                .runOn(Schedulers.boundedElastic())
                 .sequential()
                 .collectList()
-                .flatMap(products -> {
-                    return purchaseRepository.save(
+                .flatMap(products ->
+                    purchaseRepository.save(
                             Purchase.builder()
-                                    .products(products.stream().map(Product::getId)
-                                    .collect(Collectors.toList()))
+                                    .products(products)
                                     .id(UUID.randomUUID()).build()
-                    );
-                })
+                    )
+                )
                 .doOnError(err -> err.printStackTrace());
     }
 }
