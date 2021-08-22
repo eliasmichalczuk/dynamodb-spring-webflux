@@ -13,6 +13,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Component
 public class PurchaseHandler {
 
@@ -28,8 +31,12 @@ public class PurchaseHandler {
     }
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
+        var dataDeStr = request.queryParam("dataDe").orElseGet(null);
+        var dataAteStr = request.queryParam("dataAte").orElseGet(null);
+        LocalDateTime dataDe = dataDeStr != null ? LocalDateTime.parse(dataDeStr) : null;
+        LocalDateTime dataAte = dataAteStr != null ? LocalDateTime.parse(dataAteStr) : null;
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(purchaseApplicationService.getAll(), Purchase.class).doOnError(err -> {
+                .body(purchaseApplicationService.getAll(dataDe, dataAte), Purchase.class).doOnError(err -> {
                     err.printStackTrace();
                 });
     }
