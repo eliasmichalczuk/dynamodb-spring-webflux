@@ -28,7 +28,7 @@ public class ProductHandler {
     @Autowired
     private ProductRepository productRepository;
 
-    public Mono<ServerResponse> save(ServerRequest request) {
+    public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(Product.class)
                 .flatMap(product -> productRepository.save(product.generateId()))
                 .flatMap(product -> ServerResponse.ok().build())
