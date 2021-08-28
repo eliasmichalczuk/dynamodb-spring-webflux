@@ -24,6 +24,7 @@ public class Restaurant {
     @Id
     private UUID id;
     private String name;
+    @GeoSpatialIndexed(name = "location", type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint location;
     @Builder.Default
     private LocalDateTime created = LocalDateTime.now();
