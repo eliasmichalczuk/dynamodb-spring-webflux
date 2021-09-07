@@ -1,7 +1,9 @@
 package com.elias.michalczuk.dynamodbspring;
 
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,5 +97,14 @@ class DynamodbSpringApplicationTests {
 		}
 	}
 
+	@Test
+	public void monoZipTest() {
+		Mono.zip(Mono.just(1), Mono.just(2)).zipWhen(data -> Mono.just(3)).flatMap(res -> {
+			System.out.println("res.getT1().getT1() " + res.getT1().getT1());
+			System.out.println("res.getT1().getT2() " + res.getT1().getT2());
+			System.out.println("getT2 " + res.getT2());
+			return Mono.just(0);
+		}).subscribe();
+	}
 
 }

@@ -40,45 +40,45 @@ public class PurchaseApplicationService {
                     throw new CustomerNotFoundException();
                 }))
                 .onErrorStop();
-        return Flux.fromIterable(purchase.getProductIds())
+        var products = Flux.fromIterable(purchase.getProductIds())
                 .flatMap(uuid -> productRepository.findById(uuid)
                         .switchIfEmpty(Mono.defer(() -> {
                             throw new ProductNotFoundException();
                         }))
                         .onErrorStop()
                 )
-                .zipWith(customer)
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
                 .sequential()
                 .collectList()
-                .flatMap(zipProdCustomer ->
-                    purchaseRepository.save(
-                            Purchase.builder()
-                                    .customerId(zipProdCustomer.get(0).getT2().getId())
-                                    .products(zipProdCustomer.stream().map(p-> p.getT1().getId()).collect(Collectors.toList()))
-                                    .id(UUID.randomUUID()).build()
-                    )
-                )
                 .doOnError(err -> err.printStackTrace());
+        return Mono.zip(products, customer).flatMap(result ->
+                purchaseRepository.save(
+                                Purchase.builder()
+                                        .customerId(result.getT2().getId())
+                                        .products(result.getT1().stream().map(Product::getId).collect(Collectors.toList()))
+                                        .id(UUID.randomUUID())
+                                        .build()
+                        )
+                        .doOnError(err -> err.printStackTrace())
+                );
     }
 
     public Flux<PurchaseGetAllDto> getAll(LocalDateTime dataDe, LocalDateTime dataAte) {
         return findAll(dataDe, dataAte)
                 .flatMap(purchase -> {
-                    var customer = purchase.getCustomerId() != null ?
+                    var customerMono = purchase.getCustomerId() != null ?
                             (customerRepository.findById(purchase.getCustomerId())
                             .switchIfEmpty(Mono.defer(() -> {
                                 throw new ProductNotFoundException();
                             }))
                             .onErrorStop()) : Mono.just(Customer.builder().build());
-                   return productRepository.findAllById(purchase.getProducts())
-                           .zipWith(customer)
+                    var productsFlux = productRepository.findAllById(purchase.getProducts())
                             .parallel()
                             .runOn(Schedulers.boundedElastic())
                             .sequential()
-                            .collectList()
-                            .map(products -> PurchaseGetAllDto.of(products.stream().map(p -> p.getT1()).collect(Collectors.toList()), products.get(0).getT2()));
+                            .collectList();
+                    return Mono.zip(customerMono, productsFlux).map(result -> PurchaseGetAllDto.of(result.getT2(), result.getT1()));
                 });
     }
 
