@@ -56,6 +56,12 @@
 			<artifactId>reactive-logstash-logging-spring-boot-starter</artifactId>
 			<version>1.0.0.RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-tools</artifactId>
+			<version>3.3.0.RELEASE</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

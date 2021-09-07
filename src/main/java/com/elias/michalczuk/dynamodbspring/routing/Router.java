@@ -25,6 +25,7 @@ public class Router {
                 .andRoute(GET("/product/{id}").and(accept(MediaType.APPLICATION_JSON)), handler::getById)
                 .andRoute(POST("/purchase/create").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::create)
                 .andRoute(GET("/purchase/getAll").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::getAll)
-                .andRoute(POST("/restaurant").and(accept(MediaType.APPLICATION_JSON)), restHandler::create);
+                .andRoute(POST("/restaurant").and(accept(MediaType.APPLICATION_JSON)), restHandler::create)
+                .andRoute(GET("/restaurant/findNear").and(accept(MediaType.APPLICATION_JSON)), restHandler::findNear);
     }
 }
