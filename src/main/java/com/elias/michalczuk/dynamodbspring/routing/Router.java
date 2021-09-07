@@ -1,5 +1,6 @@
 package com.elias.michalczuk.dynamodbspring.routing;
 
+import com.elias.michalczuk.dynamodbspring.customer.api.CustomerHandler;
 import com.elias.michalczuk.dynamodbspring.product.api.ProductHandler;
 import com.elias.michalczuk.dynamodbspring.purchase.api.PurchaseHandler;
 import com.elias.michalczuk.dynamodbspring.restaurant.api.RestaurantHandler;
@@ -17,6 +18,7 @@ public class Router {
     @Bean
     public RouterFunction<ServerResponse> route(ProductHandler handler,
                                                 PurchaseHandler purchaseHandler,
+    CustomerHandler custHandler,
     RestaurantHandler restHandler) {
 
         return RouterFunctions
@@ -26,6 +28,8 @@ public class Router {
                 .andRoute(POST("/purchase/create").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::create)
                 .andRoute(GET("/purchase/getAll").and(accept(MediaType.APPLICATION_JSON)), purchaseHandler::getAll)
                 .andRoute(POST("/restaurant").and(accept(MediaType.APPLICATION_JSON)), restHandler::create)
-                .andRoute(GET("/restaurant/findNear").and(accept(MediaType.APPLICATION_JSON)), restHandler::findNear);
+                .andRoute(GET("/restaurant/findNear").and(accept(MediaType.APPLICATION_JSON)), restHandler::findNear)
+                .andRoute(POST("/customer").and(accept(MediaType.APPLICATION_JSON)), custHandler::create)
+                .andRoute(GET("/customer").and(accept(MediaType.APPLICATION_JSON)), custHandler::getAll);
     }
 }

@@ -14,4 +14,5 @@ import java.util.UUID;
 public final class CreatePurchaseDto {
 
     private List<UUID> productIds;
+    private UUID customerId;
 }

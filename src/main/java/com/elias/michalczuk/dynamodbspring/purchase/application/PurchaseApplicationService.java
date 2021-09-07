@@ -1,6 +1,9 @@
 package com.elias.michalczuk.dynamodbspring.purchase.application;
 
 import com.elias.michalczuk.dynamodbspring.DynamodbSpringApplication;
+import com.elias.michalczuk.dynamodbspring.customer.domain.Customer;
+import com.elias.michalczuk.dynamodbspring.customer.domain.exception.CustomerNotFoundException;
+import com.elias.michalczuk.dynamodbspring.customer.repository.CustomerRepository;
 import com.elias.michalczuk.dynamodbspring.product.domain.Product;
 import com.elias.michalczuk.dynamodbspring.product.exception.ProductNotFoundException;
 import com.elias.michalczuk.dynamodbspring.product.repository.ProductRepository;
@@ -28,9 +31,15 @@ public class PurchaseApplicationService {
 
     private PurchaseRepository purchaseRepository;
     private ProductRepository productRepository;
+    private CustomerRepository customerRepository;
     private static final Logger log = LoggerFactory.getLogger(DynamodbSpringApplication.class);
 
     public Mono<Purchase> create(CreatePurchaseDto purchase) {
+        var customer = customerRepository.findById(purchase.getCustomerId())
+                .switchIfEmpty(Mono.defer(() -> {
+                    throw new CustomerNotFoundException();
+                }))
+                .onErrorStop();
         return Flux.fromIterable(purchase.getProductIds())
                 .flatMap(uuid -> productRepository.findById(uuid)
                         .switchIfEmpty(Mono.defer(() -> {
@@ -38,14 +47,16 @@ public class PurchaseApplicationService {
                         }))
                         .onErrorStop()
                 )
+                .zipWith(customer)
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
                 .sequential()
                 .collectList()
-                .flatMap(products ->
+                .flatMap(zipProdCustomer ->
                     purchaseRepository.save(
                             Purchase.builder()
-                                    .products(products.stream().map(Product::getId).collect(Collectors.toList()))
+                                    .customerId(zipProdCustomer.get(0).getT2().getId())
+                                    .products(zipProdCustomer.stream().map(p-> p.getT1().getId()).collect(Collectors.toList()))
                                     .id(UUID.randomUUID()).build()
                     )
                 )
@@ -54,14 +65,21 @@ public class PurchaseApplicationService {
 
     public Flux<PurchaseGetAllDto> getAll(LocalDateTime dataDe, LocalDateTime dataAte) {
         return findAll(dataDe, dataAte)
-                .flatMap(purchase ->
-                    productRepository.findAllById(purchase.getProducts())
+                .flatMap(purchase -> {
+                    var customer = purchase.getCustomerId() != null ?
+                            (customerRepository.findById(purchase.getCustomerId())
+                            .switchIfEmpty(Mono.defer(() -> {
+                                throw new ProductNotFoundException();
+                            }))
+                            .onErrorStop()) : Mono.just(Customer.builder().build());
+                   return productRepository.findAllById(purchase.getProducts())
+                           .zipWith(customer)
                             .parallel()
                             .runOn(Schedulers.boundedElastic())
                             .sequential()
                             .collectList()
-                            .map(products -> PurchaseGetAllDto.of(products))
-                );
+                            .map(products -> PurchaseGetAllDto.of(products.stream().map(p -> p.getT1()).collect(Collectors.toList()), products.get(0).getT2()));
+                });
     }
 
     public Flux<Purchase> findAll(LocalDateTime dataDe, LocalDateTime dataAte) {

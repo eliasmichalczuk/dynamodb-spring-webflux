@@ -2,6 +2,7 @@ package com.elias.michalczuk.dynamodbspring.purchase.api;
 
 import com.elias.michalczuk.dynamodbspring.DynamodbSpringApplication;
 import com.elias.michalczuk.dynamodbspring.purchase.api.dto.CreatePurchaseDto;
+import com.elias.michalczuk.dynamodbspring.purchase.api.dto.PurchaseGetAllDto;
 import com.elias.michalczuk.dynamodbspring.purchase.application.PurchaseApplicationService;
 import com.elias.michalczuk.dynamodbspring.purchase.domain.Purchase;
 import org.slf4j.Logger;
@@ -31,12 +32,12 @@ public class PurchaseHandler {
     }
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
-        var dataDeStr = request.queryParam("dataDe").orElseGet(null);
-        var dataAteStr = request.queryParam("dataAte").orElseGet(null);
+        var dataDeStr = request.queryParam("dataDe").orElseGet(() -> null);
+        var dataAteStr = request.queryParam("dataAte").orElseGet(() -> null);
         LocalDateTime dataDe = dataDeStr != null ? LocalDateTime.parse(dataDeStr) : null;
         LocalDateTime dataAte = dataAteStr != null ? LocalDateTime.parse(dataAteStr) : null;
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(purchaseApplicationService.getAll(dataDe, dataAte), Purchase.class).doOnError(err -> {
+                .body(purchaseApplicationService.getAll(dataDe, dataAte), PurchaseGetAllDto.class).doOnError(err -> {
                     err.printStackTrace();
                 });
     }

@@ -31,6 +31,7 @@ public class Purchase {
     @Builder.Default
     @Indexed
     private LocalDateTime date = LocalDateTime.now();
+    private UUID customerId;
 
 
     public Purchase generateId() {
