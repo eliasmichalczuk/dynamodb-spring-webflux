@@ -1,12 +1,15 @@
 package com.elias.michalczuk.dynamodbspring.product.domain;
 
+import com.elias.michalczuk.dynamodbspring.product.repository.RedisProduct;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
@@ -14,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Document
 @Setter
-public class Product {
+public class Product implements Serializable{
 
     @Id
     private UUID id;

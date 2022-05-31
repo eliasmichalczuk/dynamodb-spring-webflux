@@ -36,15 +36,11 @@ public class PurchaseApplicationService {
 
     public Mono<Purchase> create(CreatePurchaseDto purchase) {
         var customer = customerRepository.findById(purchase.getCustomerId())
-                .switchIfEmpty(Mono.defer(() -> {
-                    throw new CustomerNotFoundException();
-                }))
+                .switchIfEmpty(Mono.error(new CustomerNotFoundException()))
                 .onErrorStop();
         var products = Flux.fromIterable(purchase.getProductIds())
                 .flatMap(uuid -> productRepository.findById(uuid)
-                        .switchIfEmpty(Mono.defer(() -> {
-                            throw new ProductNotFoundException();
-                        }))
+                        .switchIfEmpty(Mono.error(new ProductNotFoundException()))
                         .onErrorStop()
                 )
                 .parallel()
@@ -68,11 +64,9 @@ public class PurchaseApplicationService {
         return findAll(dataDe, dataAte)
                 .flatMap(purchase -> {
                     var customerMono = purchase.getCustomerId() != null ?
-                            (customerRepository.findById(purchase.getCustomerId())
-                            .switchIfEmpty(Mono.defer(() -> {
-                                throw new ProductNotFoundException();
-                            }))
-                            .onErrorStop()) : Mono.just(Customer.builder().build());
+                            customerRepository.findById(purchase.getCustomerId())
+                                .subscribeOn(Schedulers.boundedElastic())
+                            : Mono.just(Customer.builder().build());
                     var productsFlux = productRepository.findAllById(purchase.getProducts())
                             .parallel()
                             .runOn(Schedulers.boundedElastic())

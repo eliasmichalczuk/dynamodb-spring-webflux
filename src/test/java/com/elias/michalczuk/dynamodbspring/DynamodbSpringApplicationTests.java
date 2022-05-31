@@ -1,110 +1,57 @@
 package com.elias.michalczuk.dynamodbspring;
 
+import com.elias.michalczuk.dynamodbspring.customer.domain.Customer;
+import com.elias.michalczuk.dynamodbspring.product.domain.Product;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.elias.michalczuk.dynamodbspring.CustomValidator.nameValidator;
+import static com.elias.michalczuk.dynamodbspring.CustomValidator.priceValidator;
+import static com.elias.michalczuk.dynamodbspring.ValidationResult.*;
 
 //@SpringBootTest
 class DynamodbSpringApplicationTests {
 
 	@Test
-	void contextLoads() {
+	public void predicateTest() {
+
+		System.out.println(isValid.test("111"));
+		System.out.println(isValid.test("11144444"));
+		isValid.negate().and(isValid);
+
+		List.of(1, 2, 2, 3).stream().dropWhile(toDrop -> toDrop == 2)
+				.collect(Collectors.toList()).forEach(System.out::println);
+		System.out.println(Period.between(LocalDate.now(), LocalDate.now().minusDays(2)).getDays());
+
+		StringPredicate.isValid().test("aaa");
+		isStrPhoneNumber.apply("a");
 	}
+	static Predicate<String> isValid = phoneNumber -> phoneNumber.length() > 7;
+	static Function<String, Boolean> isStrPhoneNumber = str -> str.startsWith("+");
 
-	@Test
-	public void matchStringTest() {
-		System.out.println(matchingStrings(List.of("def", "de", "fgh"), List.of("de", "imn", "fgh")));
-	}
-
-	public static List<Integer> matchingStrings(List<String> strings, List<String> queries) {
-		List<Integer> res = new ArrayList<>();
-
-		queries.forEach(q -> res.add((int) strings.stream().filter(str -> str.equals(q)).count()));
-		return res;
-	}
-
-	@Test
-	public static int[] calPoints() {
-		var a = new ArrayList<Integer>();
-//		a.stream().mapToInt(i -> i.intValue()).toarr;
-		int[] myint = new int[]{};
-		var aa = new ArrayList<Integer>();
-		return aa.stream().mapToInt(i -> i.intValue()).toArray();
-	}
-	
-	@Test
-	public void aaa() throws IOException {
-		int ch;
-		var list = new ArrayList<Integer>();
-		while ((ch = System.in.read ()) != -1) {
-			if (list.contains((Integer) ch)) {
-				System.out.write(ch);
-			} else {
-				list.add((Integer) ch);
-			}
-		}
-
-	}
-
-	public class Solution {
-
-		public void main(String[] args) throws IOException  {
-			int ch;
-			var list = new ArrayList<Integer>();
-			while ((ch = System.in.read ()) != -1) {
-				if (list.contains((Integer) ch)) {
-					System.out.write(ch);
-				} else {
-					list.add((Integer) ch);
-				}
-			}
+	public interface StringPredicate extends Predicate<String> {
+		static StringPredicate isValid() {
+			return a -> a.length() > 5;
 		}
 	}
 
-	@Test
-	public void checkOnlyChild() {
-
-
-		var childleft = new BinaryTreeNode("childleft", null, null);
-		var rightThree = new BinaryTreeNode("rightThree", null, null);
-		var rightTwo = new BinaryTreeNode("rightTwo", null, rightThree);
-		var rightOne = new BinaryTreeNode("rightOne", null, rightTwo);
-		var leftOne = new BinaryTreeNode("leftOne", childleft, null);
-		var root = new BinaryTreeNode("root", leftOne, rightOne);
-
-		var onlyChildren =  new ArrayList<BinaryTreeNode>();
-		transverse(root, onlyChildren);
-		System.out.println("only chilndrem: ");
-		System.out.println(onlyChildren);
-	}
-
-	public void transverse(BinaryTreeNode node, ArrayList<BinaryTreeNode> onlychildren) {
-		if (node.left != null) {
-			transverse(node.left, onlychildren);
-		}
-		if ((node.left != null && node.right == null) || (node.right != null && node.left == null)) {
-			onlychildren.add(node);
-		}
-		if (node.right != null) {
-			transverse(node.right, onlychildren);
-		}
-	}
 
 	@Test
-	public void monoZipTest() {
-		Mono.zip(Mono.just(1), Mono.just(2)).zipWhen(data -> Mono.just(3)).flatMap(res -> {
-			System.out.println("res.getT1().getT1() " + res.getT1().getT1());
-			System.out.println("res.getT1().getT2() " + res.getT1().getT2());
-			System.out.println("getT2 " + res.getT2());
-			return Mono.just(0);
-		}).subscribe();
+	public void testValidatorFunction() {
+		Product product = new Product(UUID.randomUUID(), "name", 10000l);
+		System.out.println(nameValidator()
+				.and(priceValidator())
+				.apply(product));
 	}
-
 }
