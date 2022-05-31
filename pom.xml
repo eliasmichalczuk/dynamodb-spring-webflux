@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.elias.michalczuk</groupId>
-	<artifactId>dynamodb-spring</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>dynamodbspring</artifactId>
+	<version>1.0</version>
 	<name>dynamodb-spring</name>
 	<description>sprig project with dynamodb</description>
 	<properties>
