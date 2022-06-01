@@ -1,3 +1,5 @@
 mvn clean package
 java -jar target/dynamodbspring-1.0.jar
 docker build -t michalczuk/mongo-db-redis-spring-app:1.0 -f docker/Dockerfile .
+
+docker-compose up --network=host --env-file=env.env

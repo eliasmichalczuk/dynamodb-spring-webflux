@@ -3,6 +3,7 @@ version: '3.1'
 services:
 
   mongo:
+    container_name: mongo
     image: mongo
     restart: always
     environment:
@@ -13,13 +14,15 @@ services:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     command: mongod --port 27017
     ports:
-      - 27017:27017
+      - "27017:27017"
+    expose:
+      - "27017"
 
-  redis:
+  redis_cache:
     image: redis/redis-stack
     restart: always
     ports:
-      - 6379:6379
+      - "6379:6379"
     command: redis-server --save 20 1 --loglevel warning --protected-mode no
     volumes:
       - redis:/data
@@ -28,25 +31,34 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_MONGODB_ADMINUSERNAME: user
       ME_CONFIG_MONGODB_ADMINPASSWORD: pass
-      ME_CONFIG_MONGODB_URL: mongodb://docker_default:27017
+      ME_CONFIG_MONGODB_URL: "mongodb://mongo"
 
   backend:
-    image: michalczuk/mongo-db-redis-spring-app:latest
+    image: michalczuk/mongo-db-redis-spring-app:1.0
     ports:
-      - 8080:9999
+      - "9999:9999"
     restart: always
     environment:
       REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_ADMINUSERNAME: user
-      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
-      ME_CONFIG_MONGODB_URL: mongodb://docker_default:27017
+      REDIS_NETWORK: "${REDIS_NETWORK}"
+      REDIS_PORT: "${REDIS_PORT}"
+      SPRING_DATA_MONGODB_URI: "${MONGO_CONNECT}"
 
+networks:
+  standart_network:
+    driver: local
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        -
+          subnet: 192.168.2.0/24
+          gateway: 192.168.2.1
 volumes:
   mongo:
     driver: local

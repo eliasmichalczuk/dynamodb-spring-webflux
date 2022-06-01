@@ -2,6 +2,7 @@ package com.elias.michalczuk.dynamodbspring.redis;
 
 import com.elias.michalczuk.dynamodbspring.product.domain.Product;
 import com.elias.michalczuk.dynamodbspring.product.repository.RedisProduct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +20,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 class RedisConfiguration {
 
+    @Autowired
+    RedisProperties redisProperties;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
 
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisProperties.network, Integer.valueOf(redisProperties.port));
         return new JedisConnectionFactory(config);
     }
 
@@ -35,7 +39,7 @@ class RedisConfiguration {
 
     @Bean
     public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);
+        return new LettuceConnectionFactory(redisProperties.network, Integer.valueOf(redisProperties.port));
     }
 
     @Bean
