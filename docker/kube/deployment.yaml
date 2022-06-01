@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-leader
+  labels:
+    app: backend
+    role: leader
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        role: leader
+        tier: backend
+    spec:
+      containers:
+        - name: leader
+          image: 'michalczuk/spring-redis-app:1.0'
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: '500m'
+              memory: '600Mi'
+            requests:
+              cpu: '400m'
+              memory: '500Mi'
+          ports:
+            - containerPort: 9999

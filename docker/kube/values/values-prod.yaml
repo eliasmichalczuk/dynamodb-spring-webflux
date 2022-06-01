@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: 'michalczuk/spring-redis-app'
+  tag: '1.0'
+  imagePullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: '500m'
+    memory: '600Mi'
+  requests:
+    cpu: '400m'
+    memory: '500Mi'
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 60
+
+environment: prod
