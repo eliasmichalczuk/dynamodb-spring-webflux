@@ -26,7 +26,7 @@ class RedisConfiguration {
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
 
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisProperties.network, Integer.valueOf(redisProperties.port));
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         return new JedisConnectionFactory(config);
     }
 
@@ -39,7 +39,7 @@ class RedisConfiguration {
 
     @Bean
     public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory() {
-        return new LettuceConnectionFactory(redisProperties.network, Integer.valueOf(redisProperties.port));
+        return new LettuceConnectionFactory(LettuceConnectionFactory.createRedisConfiguration(redisProperties.uri));
     }
 
     @Bean

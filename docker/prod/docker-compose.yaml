@@ -45,20 +45,19 @@ services:
     restart: always
     environment:
       REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-      REDIS_NETWORK: "${REDIS_NETWORK}"
-      REDIS_PORT: "${REDIS_PORT}"
+      REDIS_URI: "${REDIS_URI}"
       SPRING_DATA_MONGODB_URI: "${MONGO_CONNECT}"
 
 networks:
   standart_network:
     driver: local
-    driver_opts:
-      parent: eth0
-    ipam:
-      config:
-        -
-          subnet: 192.168.2.0/24
-          gateway: 192.168.2.1
+#    driver_opts:
+#      parent: eth0
+#    ipam:
+#      config:
+#        -
+#          subnet: 192.168.2.0/24
+#          gateway: 192.168.2.1
 volumes:
   mongo:
     driver: local
