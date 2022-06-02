@@ -1,26 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  name: mongodb-deployment
   labels:
-    app: mongo
-  name: mongo
+    app: mongodb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: mongodb
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        app: mongo
+        app: mongodb
     spec:
       containers:
-        - image: mongo
-          name: mongo
-          args: ["--dbpath","/data/db"]
+        - name: mongodb
+          image: mongo
+          ports:
+            - containerPort: 27017
           livenessProbe:
             exec:
               command:
@@ -65,3 +64,15 @@ spec:
         - name: "mongo-data-dir"
           persistentVolumeClaim:
             claimName: "pvc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    tier: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

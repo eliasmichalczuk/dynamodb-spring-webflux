@@ -4,7 +4,13 @@ docker build -t michalczuk/mongo-db-redis-spring-app:1.0 -f docker/Dockerfile .
 
 docker-compose up
 
+docker tag 0ae38e7a0453 michalczuk/spring-redis-app:1.0
+docker push michalczuk/spring-redis-app:1.0
+
+minikube start
 kubectl apply -f mongo-deployment.yaml -f redis-pod.yaml -f backend-service.yaml -f deployment.yaml
 kubectl delete -f backend-service.yaml -f deployment.yaml -f mongo-deployment.yaml -f redis-pod.yaml
+kubectl delete pod backend-servoce svc-pod1
 kubectl describe service backend
 kubectl get pod -o wide
+to have an external ip with minikube: minikube service backend-service
