@@ -1,25 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-leader
+  name: backend-deployment
   labels:
-    app: backend
-    role: leader
-    tier: backend
+    app: backend-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: backend-api
   template:
     metadata:
       labels:
-        app: backend
-        role: leader
-        tier: backend
+        app: backend-api
     spec:
       containers:
-        - name: leader
+        - name: backend-api
+          ports:
+            - containerPort: 9999
           image: 'michalczuk/spring-redis-app:1.0'
           imagePullPolicy: IfNotPresent
           resources:
@@ -31,8 +29,6 @@ spec:
               memory: '500Mi'
           env:
             - name: REDIS_URI
-              value: redis://rediscache
+              value: redis://rediscache-service
             - name: SPRING_DATA_MONGODB_URI
-              value: mongodb://user:pass@mongo/mongodb
-          ports:
-            - containerPort: 9999
+              value: mongodb://user:pass@mongodb-service/mongodb

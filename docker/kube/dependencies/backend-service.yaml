@@ -4,10 +4,10 @@ metadata:
   name: backend-service
 spec:
   selector:
-    tier: api-service
+    app: backend-api
   ports:
     - protocol: TCP
-      port: 9999
+      port: 80
       targetPort: 9999
       nodePort: 30157
   type: LoadBalancer
